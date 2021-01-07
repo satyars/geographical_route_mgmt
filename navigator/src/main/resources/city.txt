@@ -2,4 +2,4 @@ Boston, New York
 Philadelphia, Newark
 Newark, Boston
 Trenton, Albany
-Maimi, Atlanta
+Miami, Atlanta

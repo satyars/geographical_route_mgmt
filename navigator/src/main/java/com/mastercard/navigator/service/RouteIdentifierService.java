@@ -4,7 +4,7 @@ package com.mastercard.navigator.service;
  * @author Satya Molleti
  *
  */
-public interface RouteIdenfierService {
+public interface RouteIdentifierService {
 /**
  * 
  * @param origin
