@@ -1,0 +1,7 @@
+logging:
+  pattern:
+    console: "%d{MM-dd HH:mm:ss.SSS} |%X| %5p [%t] %-40.40c{1.} : %m%n%ex"
+  level:
+    root: info
+    com.mastercard: info
+    org.springframework: info
