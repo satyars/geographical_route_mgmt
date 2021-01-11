@@ -39,13 +39,14 @@ public class LoadCityRouteConfigHandlerImpl implements LoadCityRouteConfigHandle
 	}
 
 	/**
-	 * This method is used cache the city route mapping to redis.
+	 * This method is used cache the city route mapping to redis and return.
 	 * 
 	 * @throws IOException.
 	 */
 	@Override
 	public Map<String, HashSet<String>> getCityRouteMappings() {
 		Map<String, HashSet<String>> cityRouteMapping = null;
+		Map<String,String> cityMapping =new HashMap<>();
 		try {
 			if (!redisTemplate.hasKey(Utilities.REDIS_CACHE_CITY_ROUTES_KEY)) {
 				cityRouteMapping = new HashMap<>();
@@ -56,6 +57,7 @@ public class LoadCityRouteConfigHandlerImpl implements LoadCityRouteConfigHandle
 					while ((line = br.readLine()) != null) {
 						arrayLines = line.split(",");
 						log.debug("{}, {} ", arrayLines[0], arrayLines[1]);
+						cityMapping.put(arrayLines[0], arrayLines[1]);
 						findExistingMapping(cityRouteMapping, arrayLines[0].trim(), arrayLines[1].trim());
 						findExistingMapping(cityRouteMapping, arrayLines[1].trim(), arrayLines[0].trim());
 					}
@@ -63,14 +65,18 @@ public class LoadCityRouteConfigHandlerImpl implements LoadCityRouteConfigHandle
 					log.error(ex);
 				}
 				log.debug("Loaded city.txt  data --> {}", cityRouteMapping);
-				valOps.set("CityRoutes", cityRouteMapping);
+				/* System.out.println("Loaded city.txt  data --> {}"+ cityRouteMapping); */
+				valOps.set(Utilities.REDIS_CACHE_CITY_ROUTES_KEY, cityRouteMapping);
+				valOps.set("cityMapping", cityMapping);/* for another alternative solution this could be remove try do */
 			} else {
 				Object object = valOps.get(Utilities.REDIS_CACHE_CITY_ROUTES_KEY);
 				Map<String, HashSet<String>> cityMap = null;
 
 				if (object instanceof Map) {
-					cityMap = (Map<String, HashSet<String>>) object;
+					cityRouteMapping = (Map<String, HashSet<String>>) object;
 				}
+				log.debug("Cache ity.txt  data --> {}"+ cityRouteMapping);
+				/* System.out.println("Cache ity.txt  data --> {}"+ cityRouteMapping); */
 			}
 		} catch (Exception ex) {
 			log.debug("Error while loading/reading from readis cache date  --> {} Excption : {}", cityRouteMapping, ex);
@@ -78,6 +84,15 @@ public class LoadCityRouteConfigHandlerImpl implements LoadCityRouteConfigHandle
 		return cityRouteMapping;
 	}
 
+	
+	public Map<String,String> getCityMappings(){
+		Map<String,String> cityMap = null; 
+		Object object =  valOps.get("cityMapping");
+		if (object instanceof Map) {
+			cityMap = (Map<String, String>) object;
+		}
+		return cityMap;
+	}
 	private void findExistingMapping(Map<String, HashSet<String>> cities, String origin, String destination) {
 		if (cities.get(destination) != null) {
 			if (!cities.get(destination).contains(origin)) {
@@ -94,6 +109,7 @@ public class LoadCityRouteConfigHandlerImpl implements LoadCityRouteConfigHandle
 			cities.put(destination, new HashSet<>());
 			cities.get(destination).add(origin);
 		}
+		
 	}
 
 }

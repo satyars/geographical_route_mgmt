@@ -5,3 +5,5 @@ logging:
     root: info
     com.mastercard: info
     org.springframework: info
+  file:
+    path: "/navigator.log"
